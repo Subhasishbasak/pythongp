@@ -3,7 +3,10 @@
 
 ### To Run
 
-coming soon
+Syntax:
+```
+python3 run_test.py
+```
 
 ### Directory layout
 

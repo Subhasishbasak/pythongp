@@ -173,7 +173,7 @@ def test01(pgp):
 
     # with pre specified inputs
 
-    '''
+    
     kernel_dict_input = {}
     #kernel_dict_input['Matern'] = {'lengthscale': 1, 'order': 1.5, 'lengthscale_bounds': '(1e-5, 1e5)'}
     kernel_dict_input['RBF'] = {'lengthscale': 1, 'lengthscale_bounds': '(1e-5, 1e5)'}
@@ -200,28 +200,28 @@ def test01(pgp):
     #k = (k1 * k2) + k3
 
     pgp.set_kernel (k1)
-
+    '''
 
     ######################## Specifying the Mean Function ###########################
 
     # with pre specified inputs
-    '''
+    
     m = mean.Mean()
     m.construct('Zero')
     pgp.set_mean (m)
     
-    '''
+    
 
     # with user inputs
-
+    '''
     m = mean.Mean()
     m.construct()
     pgp.set_mean (m)
-
+    '''
     ##################### Construction of the regression model ######################
 
     pgp.init_model(noise=0.001)
-    pgp.optimize(param_opt='Not_optimize', itr=10)
+    pgp.optimize(param_opt='MLE', itr=10)
     
     ############################## Making predictions ###############################
 

@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.mlab as ml
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 
 from sklearn.metrics import r2_score
 
@@ -20,8 +21,8 @@ def make_data(input_dim, test_func, x_1_bounds, *arg):
         Stores the training data in a dataframe and generates a plot
         '''
         np.random.seed(0)
-        n = 100 # number of training data points
-        m = 1000 # number of test data points
+        n = 50 # number of training data points
+        m = 500 # number of test data points
         
         if input_dim == 1:
             x_min = x_1_bounds[0]
@@ -85,7 +86,7 @@ def plot (test_data_frame, train_data_frame, postmean, postvar):
 
     plt.figure()
 
-    plt.plot(test_data_frame['x'], test_data_frame['z_test'], 'r:', label=r'Test function')
+    plt.plot(test_data_frame['x'], test_data_frame['z_test'], 'g:', label=r'Test function')
 
     plt.plot(train_data_frame['x'], train_data_frame['z_train'], 'r.', markersize=10, label=u'Observations')
 
@@ -161,7 +162,8 @@ def test01(pgp):
     test_func, x_min, x_max = test_functions.f01, test_functions.func_domain[1][0], test_functions.func_domain[1][1]
 
     train_data, test_data = make_data(1,test_func, [x_min, x_max])
-
+    
+    
     ############################## Initializing the test ############################
 
 
@@ -173,7 +175,7 @@ def test01(pgp):
 
     # with pre specified inputs
 
-    
+    '''
     kernel_dict_input = {}
     #kernel_dict_input['Matern'] = {'lengthscale': 1, 'order': 1.5, 'lengthscale_bounds': '(1e-5, 1e5)'}
     kernel_dict_input['RBF'] = {'lengthscale': 1, 'lengthscale_bounds': '(1e-5, 1e5)'}
@@ -200,28 +202,28 @@ def test01(pgp):
     #k = (k1 * k2) + k3
 
     pgp.set_kernel (k1)
-    '''
+
 
     ######################## Specifying the Mean Function ###########################
 
     # with pre specified inputs
-    
+    '''
     m = mean.Mean()
     m.construct('Zero')
     pgp.set_mean (m)
     
-    
+    '''
 
     # with user inputs
-    '''
+
     m = mean.Mean()
     m.construct()
     pgp.set_mean (m)
-    '''
+
     ##################### Construction of the regression model ######################
 
     pgp.init_model(noise=0.001)
-    pgp.optimize(param_opt='MLE', itr=10)
+    pgp.optimize(param_opt='Not_optimize', itr=10)
     
     ############################## Making predictions ###############################
 
@@ -247,12 +249,45 @@ def test02(pgp):
 
     # defining test function
 
-    test_func, x_min, x_max = test_functions.f03, test_functions.func_domain[3][0], test_functions.func_domain[3][1]
+    test_func, x_min, x_max = test_functions.f01, test_functions.func_domain[1][0], test_functions.func_domain[1][1]
 
     # generate data
 
     train_data, test_data = make_data(1, test_func, [x_min, x_max])
-
+    '''
+    data = pd.read_csv("/home/subhasish/L2S/my_experiments/GPR_fitting/CopperThermExpand.CSV")
+    data.sort_values(by=['x'], inplace=True)
+    test_data = pd.DataFrame(data.iloc[list(range(0,2500))[::25]], columns = ['y', 'x'])
+    test_data.rename(columns = {'y':'z_test'}, inplace = True) 
+    
+    data.drop(data.index[list(range(0,250))[::25]], inplace=True)
+    
+    train_data = data
+    train_data.rename(columns = {'y':'z_train'}, inplace = True) 
+    
+    
+    
+    
+    data.sort_values(by=['age'], inplace=True)
+    train_data = pd.DataFrame(data[:2500], columns = ['wage', 'age'])
+    train_data.rename(columns = {'wage':'z_train', 'age':'x'}, inplace = True) 
+    
+    test_data = pd.DataFrame(data[2500:], columns = ['wage', 'age'])
+    test_data.rename(columns = {'wage':'z_test', 'age':'x'}, inplace = True)
+    
+    #row1 = data.iloc[list(range(0,40))[::5]] 
+    
+    data = pd.read_csv("/home/subhasish/L2S/my_experiments/GPR_fitting/WagevsAge.CSV")
+    data.sort_values(by=['age'], inplace=True)
+    test_data = pd.DataFrame(data.iloc[list(range(0,3000))[::250]], columns = ['wage', 'age'])
+    test_data.rename(columns = {'wage':'z_test', 'age':'x'}, inplace = True) 
+    
+    data.drop(data.index[list(range(0,3000))[::250]], inplace=True)
+    
+    train_data = data
+    train_data.rename(columns = {'wage':'z_train', 'age':'x'}, inplace = True) 
+    '''
+    
     '''
     Afterwards this test works with the same loaded data for each library
     '''
@@ -264,7 +299,7 @@ def test02(pgp):
     # Constructing the Kernel
 
     kernel_dict_input = {}
-    #kernel_dict_input['Matern'] = {'lengthscale': 1, 'order': 1.5, 'lengthscale_bounds': '(1e-5, 1e5)'}
+    #kernel_dict_input['Matern'] = {'lengthscale': 0.1, 'order': 1.5, 'lengthscale_bounds': '(1e-5, 1e5)'}
     kernel_dict_input['RBF'] = {'lengthscale': 1, 'lengthscale_bounds': '(1e-5, 1e5)', 'scale': 1}
     #kernel_dict_input['RatQd'] = {'lengthscale': 1 , 'power': 1.5, 'lengthscale_bounds': '(1e-5, 1e5)'}
     k = kernel.Kernel()
@@ -281,7 +316,7 @@ def test02(pgp):
     # Construction of the regression model
 
     pgp.init_model(noise=0.0001)
-    pgp.optimize(param_opt='MLE', itr=10)
+    pgp.optimize(param_opt='MLE', itr=1)
 
     # Making predictions
 
@@ -688,5 +723,80 @@ def test_simulate(pgp, n):
     return emrmse_dict, pmrmse_dict, time_dict
 
 
+def test_multivar_user_data(pgp):
 
+    '''
+    test_multivar_user_data
+    Author: S.B
+    Description: The following code implements Gaussian Process regression and
+    compares the prediction accuracies of different python libraries for a given
+    data
+    '''
 
+    # defining test function
+    
+    import pandas as pd
+    '''
+    data = pd.read_csv("/home/subhasish/L2S/test-functions/data/borehole_3d.csv")
+
+    x_train, z_train, x_test, z_test = np.array(list(zip(data["x0"], data["x1"], data["x2"], data["x3"], data["x4"], data["x5"], data["x6"], data["x7"])))[:20], np.array(data["f"][:20]),np.array(list(zip(data["x0"], data["x1"], data["x2"], data["x3"], data["x4"], data["x5"], data["x6"], data["x7"])))[20:], np.array(data["f"][20:])
+    '''
+    data = pd.read_csv("/home/subhasish/L2S/my_experiments/GPR_fitting/Lubricant.CSV")
+    
+    #x_train, z_train, x_test, z_test = np.array(list(zip(data["n.pent"], data["iso.pen"], data["rate"])))[:18], np.array(data["hyd"][:18]),np.array(list(zip(data["n.pent"], data["iso.pen"], data["rate"])))[18:], np.array(data["hyd"][18:])
+    
+    x_train, z_train, x_test, z_test = np.array(list(zip(data["viscos"], data["tempC"])))[:45], np.array(data["pressure"][:45]),np.array(list(zip(data["viscos"], data["tempC"])))[45:], np.array(data["pressure"][45:])
+
+    '''
+    Afterwards this test works with the same loaded data for each library
+    '''
+
+    # Reshaping the data according to library configuration
+
+    pgp.load_mult_data(x_train, z_train)
+
+    # Constructing the Kernel
+
+    kernel_dict_input = {}
+    #kernel_dict_input1 = {}
+    #kernel_dict_input['Matern'] = {'lengthscale': [.1,.1], 'order': 1.5, 'lengthscale_bounds': '(1e-5, 1e5)'}
+    kernel_dict_input['RBF'] = {'lengthscale': [.1]*2 , 'lengthscale_bounds': '(1e-5, 1e5)', 'scale': 1}
+    #kernel_dict_input['RatQd'] = {'lengthscale': 1 , 'power': 1.5, 'lengthscale_bounds': '(1e-5, 1e5)'}
+    #kernel_dict_input1['Const'] = {'constant': 1}
+    
+    k = kernel.Kernel()
+    k.construct(kernel_dict_input)
+    
+    #k1 = kernel.Kernel()
+    #k1.construct(kernel_dict_input1)
+    
+    pgp.set_kernel (k, ard = True)
+    '''
+    Set ard = True for different lenghscale for different dimensions
+    '''
+    # Specifying the Mean Function
+
+    m = mean.Mean()
+    m.construct('Zero')
+    pgp.set_mean (m)
+
+    # Construction of the regression model
+
+    pgp.init_model(noise=0.0001)
+    pgp.optimize(param_opt='MLE', itr=10)
+    
+    # Making predictions
+
+    z_postmean, z_postvar = pgp.predict_mult(x_test)
+
+    # Plotting the predictions
+
+    #plot(test_data, train_data, z_postmean, z_postvar)
+
+    # Computing accuracy
+    
+    test_data = pd.DataFrame()
+    test_data["z_test"] = z_test
+    accuracy(test_data, z_postmean, z_postvar)
+    
+    

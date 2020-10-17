@@ -151,7 +151,7 @@ class gpy_wrapper():
                                         noise_var = noise, mean_function=self.mean_function)
 
             #TODO:() Make it a parameter
-            self.model.Gaussian_noise.variance.fix()
+#            self.model.Gaussian_noise.variance.fix()
             if hasattr(self.model, 'sum'):
                 self.model.sum.constant.variance.fix()
 

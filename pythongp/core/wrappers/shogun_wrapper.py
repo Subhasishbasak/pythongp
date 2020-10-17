@@ -176,7 +176,7 @@ class shogun_wrapper():
         print("Optimized kernel lengthscale :", best_width)
         print("Optimized kernel scaling :", best_scale)
         print("Optimized observation noise :", best_sigma)
-
+        print("Optimized Likelihood :", self.inference_method.get_marginal_likelihood_estimate())
         # Training the model
         self.model.train()
 

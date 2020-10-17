@@ -176,6 +176,7 @@ class openturns_wrapper():
         result = self.model.getResult()
         print("parameter after optimization : \n",result.getCovarianceModel())
         print("Nugget", self.model.getNoise())
+        #print("likelihood : ", result.getObjectiveFunction())
         self.model = result
 
 
